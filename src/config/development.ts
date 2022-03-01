@@ -10,7 +10,7 @@ const development: Config.AppConfig = {
     entityPrefix: 'st-',
     autoLoadEntities: true,
     synchronize: true,
-    logging: true,
+    // logging: true,
   },
 };
 

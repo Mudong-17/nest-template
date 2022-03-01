@@ -1,39 +1,50 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm'
-import {Repository} from "typeorm";
-import {CreateUserDto} from './dto/create-user.dto';
-import {UpdateUserDto} from './dto/update-user.dto';
-import {User} from "./entities/user.entity";
+import { HttpException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-    constructor(
-        @InjectRepository(User)
-        private userRepository: Repository<User>
-    ) {
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    const { phone } = createUserDto;
+    const user = await this.findOneByPhone(phone);
+    if (user) {
+      throw new HttpException('该手机号已注册', 401);
     }
 
-    create(createUserDto: CreateUserDto) {
-        return 'This action adds a new user';
-    }
+    const newUser = this.userRepository.create(createUserDto);
 
-    findAll() {
-        return `This action returns all user`;
-    }
+    return await this.userRepository.save(newUser);
+  }
 
-    findOne(id: number) {
-        return `This action returns a #${id} user`;
-    }
+  findAll() {
+    return `This action returns all user`;
+  }
 
-    update(id: number, updateUserDto: UpdateUserDto) {
-        return `This action updates a #${id} user`;
-    }
+  findOne(id: number) {
+    return `This action returns a #${id} user`;
+  }
 
-    remove(id: number) {
-        return `This action removes a #${id} user`;
-    }
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return `This action updates a #${id} user`;
+  }
 
-    async findOneByName(username: string) {
-        return `This action removes a #${username} user`;
-    }
+  remove(id: number) {
+    return `This action removes a #${id} user`;
+  }
+
+  async findOneByPhone(phone: string) {
+    return await this.userRepository.findOne({ phone });
+  }
+
+  async findOneByName(username: string) {
+    return `This action removes a #${username} user`;
+  }
 }
