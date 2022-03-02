@@ -33,9 +33,16 @@ declare namespace Config {
       expiresIn: string;
     };
   };
+  type Redis = {
+    host: string;
+    port: number;
+    db: string;
+    password?: string;
+  };
   type AppConfig = {
-    Port: number;
-    TypeORM: TypeORM;
+    Port?: number;
+    TypeORM?: TypeORM;
     JWT?: JWT;
+    Redis?: Redis;
   };
 }

@@ -1,49 +1,38 @@
-import {Injectable} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
-import {CreateAuthDto} from './dto/create-auth.dto';
-import {UserService} from "../user/user.service";
+import { HttpException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+// import { CreateAuthDto } from './dto/create-auth.dto';
+import { UserService } from '../user/user.service';
+import { RedisInstance } from '../../utils/redis';
 
 @Injectable()
 export class AuthService {
-    constructor(
-        private usersService: UserService,
-        private jwtService: JwtService,
-    ) {
+  constructor(
+    private usersService: UserService,
+    private jwtService: JwtService,
+  ) {}
+
+  async validateUser({ phone, password }): Promise<any> {
+    const user = await this.usersService.findOneByPhone(phone);
+
+    if (user) {
+      return user;
     }
+    throw new HttpException('该手机号未注册', 400);
+  }
 
-    async validateUser(username: string, password: string): Promise<any> {
-        console.log('auth service validateUser', username, password);
-        const data = await this.usersService.findOneByName(username);
-
-        console.log('auth service validateUser data', data);
-
-        const user = JSON.parse(JSON.stringify(data || {}));
-
-        // password = cryptoString(password);
-
-        if (user && user.password === password) {
-            const {password, ...result} = user;
-            return result;
-        }
-        return null;
+  async certificate(user) {
+    const payload = {
+      account: user.account,
+      userId: user['id'],
+      phone: user.phone,
+    };
+    try {
+      const access_token = this.jwtService.sign(payload);
+      const redis = await RedisInstance.initRedis('auth.certificate', 0);
+      await redis.setex(`${user.id}-${user.account}`, 300, `${access_token}`);
+      return { access_token };
+    } catch (error) {
+      throw new HttpException('账号或密码错误', 401);
     }
-
-    async login(user) {
-        console.log('login  xxxxxx', user);
-        const payload = {
-            username: user.name,
-            userId: user['id'],
-            roles: user.roles,
-            status: user.status,
-            department: user.department,
-            phone: user.phone,
-            avatar: user.avatar,
-            departmentName: user.departmentName,
-            departmentId: user.departmentId,
-            areaId: user.areaId,
-        };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
-    }
+  }
 }
