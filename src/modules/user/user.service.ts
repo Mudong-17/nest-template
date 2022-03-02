@@ -44,6 +44,14 @@ export class UserService {
     return await this.userRepository.findOne({ phone });
   }
 
+  async findOneByPhoneLogin(phone: string) {
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.phone=:phone', { phone })
+      .getOne();
+  }
+
   async findOneByName(username: string) {
     return `This action removes a #${username} user`;
   }

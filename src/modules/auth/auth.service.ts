@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-// import { CreateAuthDto } from './dto/create-auth.dto';
+// import { AuthDto } from './dto/create-auth.dto';
 import { UserService } from '../user/user.service';
 import { RedisInstance } from '../../utils/redis';
 
