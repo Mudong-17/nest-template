@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 // import { AuthDto } from './dto/create-auth.dto';
 import { UserService } from '../user/user.service';
 import { RedisInstance } from '../../utils/redis';
+import { isMatch } from '../../utils/bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -12,10 +13,11 @@ export class AuthService {
   ) {}
 
   async validateUser({ phone, password }): Promise<any> {
-    const user = await this.usersService.findOneByPhone(phone);
+    const user = await this.usersService.findOneByPhoneLogin(phone);
 
     if (user) {
-      return user;
+      if (isMatch(password, user.password)) return user;
+      throw new HttpException('密码错误', 400);
     }
     throw new HttpException('该手机号未注册', 400);
   }
@@ -23,7 +25,7 @@ export class AuthService {
   async certificate(user) {
     const payload = {
       account: user.account,
-      userId: user['id'],
+      userId: user.id,
       phone: user.phone,
     };
     try {

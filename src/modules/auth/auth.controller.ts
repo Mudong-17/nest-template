@@ -1,10 +1,4 @@
-import {
-  Controller,
-  UseGuards,
-  Post,
-  Body,
-  HttpException,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
 
@@ -16,7 +10,6 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     const user = await this.authService.validateUser(loginDto);
     if (user) return this.authService.certificate(user);
-
     throw new HttpException('用户不存在', 404);
   }
 }

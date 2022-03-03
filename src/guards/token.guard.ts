@@ -11,7 +11,6 @@ export class TokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
-    console.log(user);
     // 获取请求头里的 token
     const authorization = request['headers'].authorization || 0;
     if (!authorization) throw new UnauthorizedException();

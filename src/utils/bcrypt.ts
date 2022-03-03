@@ -12,3 +12,10 @@ export const makeSalt = () => bcrypt.genSaltSync(10);
  */
 export const encryptPassword = (password: string, salt: string) =>
   bcrypt.hashSync(password, salt);
+
+/**
+ * Compare password
+ * @param password 密码
+ * @param hash hash密码
+ */
+export const isMatch = (password, hash) => bcrypt.compareSync(password, hash);
