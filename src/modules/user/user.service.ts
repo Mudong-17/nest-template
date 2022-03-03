@@ -15,13 +15,14 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const { phone } = createUserDto;
     const user = await this.findOneByPhone(phone);
+
     if (user) {
       throw new HttpException('该手机号已注册', 401);
     }
-
     const newUser = this.userRepository.create(createUserDto);
 
-    return await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
+    return {};
   }
 
   findAll() {

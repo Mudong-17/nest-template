@@ -10,7 +10,7 @@ export function LoggerMiddleware(
   next();
   //  组装日志信息
   // prettier-ignore
-  const logFormat = `Method:${req.method}; Request original url: ${req.originalUrl}; IP:${req.ip}; Status code:${code} `;
+  const logFormat = `Method:${req.method}; Request original url: ${req.originalUrl}; IP:${req.ip}; Status code:${code}`;
   // 根据状态码进行日志类型区分
   if (code >= 500) {
     Logger.error(logFormat);

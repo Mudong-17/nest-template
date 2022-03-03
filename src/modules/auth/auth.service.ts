@@ -29,10 +29,16 @@ export class AuthService {
     try {
       const access_token = this.jwtService.sign(payload);
       const redis = await RedisInstance.initRedis('auth.certificate', 0);
-      await redis.setex(`${user.id}-${user.account}`, 300, `${access_token}`);
+      await redis.setex(
+        `${user.id}-${user.account}`,
+        2 * 60 * 60,
+        `${access_token}`,
+      );
       return { access_token };
     } catch (error) {
       throw new HttpException('账号或密码错误', 401);
     }
   }
+
+  // async getUser(user: User) {}
 }

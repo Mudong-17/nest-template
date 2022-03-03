@@ -5,12 +5,9 @@ import {
   BeforeInsert,
   CreateDateColumn,
   UpdateDateColumn,
-  Timestamp,
 } from 'typeorm';
 import stringRandom from 'string-random';
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const bcrypt = require('bcryptjs');
+import { encryptPassword, makeSalt } from '../../../utils/bcrypt';
 
 @Entity('user')
 export class User {
@@ -54,6 +51,9 @@ export class User {
   @Column({ default: 0, comment: '用户状态' })
   status: number;
 
+  @Column()
+  salt: string;
+
   @CreateDateColumn({
     name: 'created_at',
     comment: '创建时间',
@@ -67,9 +67,11 @@ export class User {
   updatedAt: Date;
 
   @BeforeInsert()
-  async encryptPwd() {
-    const salt = bcrypt.genSaltSync(10);
-    this.password = await bcrypt.hashSync(this.password, salt);
+  encryptPwd() {
+    const salt = makeSalt();
+    this.salt = salt;
+    this.password = encryptPassword(this.password, salt);
+
     // 唯一账号 随机字符串 + 注册时秒级别时间戳
     this.account =
       stringRandom(16, { numbers: false }) + Math.floor(Date.now() / 1000);

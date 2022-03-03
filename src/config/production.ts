@@ -12,6 +12,12 @@ const production: Config.AppConfig = {
     synchronize: true,
     logging: true,
   },
+  JWT: {
+    secret: 'server-template',
+    signOptions: {
+      expiresIn: '2h',
+    },
+  },
   Redis: {
     host: '127.0.0.1',
     port: 6379,
